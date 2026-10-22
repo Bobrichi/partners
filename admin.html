@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Administrator Access - Wobulenzi Financial Partners</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .admin-page{max-width:1100px}.brand{text-decoration:none}.admin-content{max-width:620px;margin:40px auto}.admin-content h1{margin:4px 0 12px}.admin-form{display:grid;gap:15px}.admin-form .btn{justify-self:start}.admin-message{min-height:1.4em;color:#596273;font-size:.8rem}.admin-message.error{color:#a33d3d}.admin-message.success{color:#23734f}.setup-note{margin:16px 0 0;padding:14px 16px;color:#6b7484;background:#f6f7fb;border:1px solid #e8eaf0;border-radius:8px;font-size:.76rem;line-height:1.6}.setup-note strong{color:#3b4454}.auth-heading{display:flex;align-items:center;gap:10px;margin-bottom:18px}.auth-dot{width:10px;height:10px;border-radius:50%;background:#d8a747;box-shadow:0 0 0 5px #fbf4e7}.admin-label{margin-bottom:4px;color:#6677c7;font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.admin-actions{display:flex;gap:9px;flex-wrap:wrap}
+    .admin-page{--auth-gold:#eac36d}.admin-content{max-width:650px;margin:44px auto}.admin-content>.hero-content{padding:clamp(27px,5vw,48px);border-color:rgba(234,195,109,.36);border-radius:16px;background:linear-gradient(145deg,rgba(22,29,35,.97),rgba(10,15,20,.98));box-shadow:0 30px 80px rgba(0,0,0,.42),inset 0 1px rgba(255,255,255,.04);animation:admin-card-enter .7s ease both}.admin-content>.hero-content::after{border-color:rgba(234,195,109,.17);box-shadow:0 0 0 24px rgba(234,195,109,.035),0 0 0 48px rgba(234,195,109,.02)}.admin-content h1{color:#fff8e8;font-size:clamp(2rem,4vw,2.8rem)}#form-description{max-width:480px;color:#c4cbc8;line-height:1.7}.admin-content .admin-label,.admin-content label{color:#efd28d}.admin-content .auth-heading{position:relative;z-index:1}.admin-content .admin-form{position:relative;z-index:1;gap:16px}.admin-content input{min-height:48px;color:#fff;background:#0b1116;border-color:rgba(235,222,191,.2);border-radius:7px}.admin-content input::placeholder{color:#87918e}.admin-content input:focus{border-color:#eac36d;outline:3px solid rgba(234,195,109,.16)}.admin-content .btn-primary{color:#17130a;background:linear-gradient(135deg,#f2d68f,#d5a846);border-color:#eac36d}.admin-content .btn-secondary{color:#f3dfb0;border-color:rgba(234,195,109,.42)}.admin-message{color:#d3d9d5}.admin-message.error{color:#ffaaa0}.admin-message.success{color:#9be1b7}.setup-note{position:relative;z-index:1;color:#c4cbc8;background:rgba(255,255,255,.035);border-color:rgba(235,222,191,.15)}.setup-note strong{color:#efd28d}@keyframes admin-card-enter{from{opacity:0;transform:translateY(17px)}to{opacity:1;transform:translateY(0)}}
+  </style>
+  <meta name="theme-color" content="#d8ad50" />
+  <link rel="manifest" href="manifest.webmanifest" /></head>
+<body>
+  <div class="page-wrap admin-page">
+    <header><a class="brand" href="admin.html"><img class="brand-logo" src="images/logo.jpeg" alt="Wobulenzi Financial Partners logo" /><span class="brand-name">WOBULENZI FINANCIAL PARTNERS<span class="small-text">Administrator access</span></span></a><button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-navigation"><span></span><span></span><span></span></button><nav id="site-navigation" class="site-nav" aria-label="Access navigation"><a href="portal.html">Member Portal</a></nav></header>
+    <main class="admin-content">
+      <section class="hero-content">
+        <div class="auth-heading"><span class="auth-dot"></span><div><div class="admin-label">Staff workspace</div><strong>Administrator access</strong></div></div>
+        <h1 id="form-title">Administrator sign in</h1>
+        <p id="form-description">Sign in with the authorized administrator account to open staff records.</p>
+        <form id="login-form" class="admin-form" onsubmit="event.preventDefault();signInAdmin()">
+          <label>Administrator account<input id="login-email" type="text" autocomplete="username" required placeholder="wobulenzipartners.com" /></label>
+          <label>Password<input id="login-password" type="password" autocomplete="current-password" required placeholder="Administrator password" /></label>
+          <div class="admin-actions"><button class="btn btn-primary" type="submit">Sign in</button></div>
+        </form>
+        <p id="admin-message" class="admin-message" role="status" aria-live="polite"></p>
+      </section>
+    </main>
+    <footer>WOBULENZI FINANCIAL PARTNERS · Staff sign-in</footer>
+  </div>
+  <script>
+    const ADMIN_SESSION='wfpAdminSessionV1';
+    const ADMIN_ACCOUNT='wobulenzipartners.com';
+    const ADMIN_PASSWORD='wobulenzi.com';
+    const allowedReturnPages=new Set(['dashboard.html','members.html','records.html','savings.html','loans.html','reports.html']);
+    function message(text,error=false){const node=document.getElementById('admin-message');node.textContent=text;node.className=`admin-message${error?' error':''}`}
+    function safeDestination(){const requested=new URLSearchParams(location.search).get('next')||'dashboard.html';const page=requested.split(/[?#]/)[0];return allowedReturnPages.has(page)?requested:'dashboard.html'}
+    function finishSignIn(){sessionStorage.setItem(ADMIN_SESSION,ADMIN_ACCOUNT);location.replace(safeDestination())}
+    function signInAdmin(){
+      const account=document.getElementById('login-email').value.trim().toLowerCase(),password=document.getElementById('login-password').value;
+      if(account!==ADMIN_ACCOUNT||password!==ADMIN_PASSWORD){message('The account or password is incorrect.',true);return}
+      finishSignIn();
+    }
+    if(new URLSearchParams(location.search).has('logout')){sessionStorage.removeItem(ADMIN_SESSION);history.replaceState(null,'','admin.html')}
+    if(sessionStorage.getItem(ADMIN_SESSION)===ADMIN_ACCOUNT){location.replace(safeDestination())}
+  </script>
+  <script src="pwa.js"></script>
+<script src="nav.js"></script></body>
+</html>

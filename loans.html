@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loan Register - Wobulenzi Financial Partners</title>
+  <script src="access.js"></script><link rel="stylesheet" href="styles.css" />
+  <style>
+    .workspace{max-width:1440px}.brand{text-decoration:none}.eyebrow{color:#6879c9;font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.heading{display:flex;justify-content:space-between;align-items:end;gap:14px;margin-bottom:20px}.heading h2{margin:0}.note{color:#858c99;font-size:.78rem}.batch-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.batch-toolbar p{margin:0;color:#737c8c;font-size:.77rem}.batch-scroll{width:100%;overflow:auto;border:1px solid #e8eaf0;border-radius:8px}.batch-table{width:100%;min-width:1280px;border-collapse:collapse}.batch-table th,.batch-table td{padding:9px;border-bottom:1px solid #edf0f4;text-align:left}.batch-table th{color:#657084;background:#f7f8fb;font-size:.64rem;text-transform:uppercase;letter-spacing:.055em}.batch-table input,.batch-table select{min-width:105px;min-height:38px;padding:8px;font-size:.76rem}.batch-table .member-name{min-width:155px}.batch-table .guarantor{min-width:145px}.batch-table .purpose{min-width:150px}.batch-table .amount{min-width:120px}.row-number{width:34px;color:#8790a0;text-align:center;font-size:.75rem}.remove-row{padding:7px 9px;color:#a44c4c;background:#fff;border:1px solid #ead9d9;border-radius:6px;font:inherit;font-size:.72rem;cursor:pointer}.batch-actions{display:flex;justify-content:space-between;gap:12px;margin-top:14px}.batch-actions-right{display:flex;gap:9px}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:8px 0 18px}.summary div{padding:15px;background:#f8f9fc;border:1px solid #e8eaf0;border-radius:8px}.summary span,.summary strong{display:block}.summary span{color:#737c8c;font-size:.72rem}.summary strong{margin-top:4px;color:#3448ad;font-size:1.2rem}.controls{display:flex;align-items:end;gap:14px;margin-bottom:16px}.controls label:first-child{flex:1}.loan-table select{min-width:118px;padding:7px}.repayment-form{display:grid;grid-template-columns:repeat(4,minmax(140px,1fr));gap:14px;align-items:end}.repayment-form .wide{grid-column:span 2}.repayment-list{margin-top:20px}.repayment-table{min-width:760px}@media(max-width:720px){.repayment-form{grid-template-columns:repeat(2,minmax(0,1fr))}.repayment-form .wide{grid-column:span 2}}@media(max-width:620px){.summary{grid-template-columns:repeat(2,1fr)}.heading{display:block}.controls{align-items:stretch;flex-direction:column}.batch-actions{align-items:stretch;flex-direction:column}.batch-actions-right{justify-content:flex-end}}
+  </style>
+  <meta name="theme-color" content="#d8ad50" />
+  <link rel="manifest" href="manifest.webmanifest" />
+<link rel="stylesheet" href="module-sidebar.css"></head>
+<body>
+  <div class="page-wrap workspace">
+    <header><a class="brand" href="dashboard.html"><img class="brand-logo" src="images/logo.jpeg" alt="Wobulenzi Financial Partners logo" /><span class="brand-name">WOBULENZI FINANCIAL PARTNERS<span class="small-text">Loan register</span></span></a><button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-navigation"><span></span><span></span><span></span></button><nav id="site-navigation" class="site-nav"><a href="dashboard.html">Dashboard</a><a href="members.html">Members</a><a href="records.html">Records</a><a href="savings.html">Savings</a><a href="loans.html" aria-current="page">Loans</a><a href="reports.html">Reports</a><a href="portal.html">Member Portal</a></nav></header>
+    <section class="hero"><div class="hero-content"><div class="eyebrow">Credit operations</div><h1>Loan register</h1><p>Enter applications for several members in one batch. Each completed row becomes a separate application and starts in Pending review.</p><div class="hero-cta"><a class="btn btn-primary" href="#loan-form">Add loan applications</a><button class="btn btn-secondary" type="button" onclick="exportCsv()">Export CSV</button></div></div></section>
+    <main>
+      <section class="panel" id="loan-form"><div class="heading"><div><div class="eyebrow">Batch applications</div><h2>Capture loan requests</h2></div><span class="note">Add one row for each member application.</span></div>
+        <form id="form" onsubmit="event.preventDefault();saveBatch()"><div class="form-section">
+          <div class="batch-toolbar"><p>Complete required fields for each row. Blank rows are ignored.</p><button class="btn btn-secondary" type="button" onclick="addRow()">+ Add another application</button></div>
+          <div class="batch-scroll"><table class="batch-table"><thead><tr><th>#</th><th>Member number *</th><th>Member name *</th><th>Loan product</th><th>Requested amount *</th><th>Rate %</th><th>Term months</th><th>Application date *</th><th>Guarantor(s)</th><th>Purpose / notes</th><th></th></tr></thead><tbody id="loan-rows"></tbody></table></div>
+          <div class="batch-actions"><button class="btn btn-secondary" type="button" onclick="resetRows()">Clear rows</button><div class="batch-actions-right"><button class="btn btn-primary" type="submit">Save all applications</button></div></div>
+        </div></form>
+      </section>
+      <section class="panel"><div class="heading"><div><div class="eyebrow">Applications</div><h2>Loan applications</h2></div><span class="note" id="count">0 applications</span></div><div class="summary"><div><span>Pending review</span><strong id="pending">0</strong></div><div><span>Approved</span><strong id="approved">0</strong></div><div><span>Active</span><strong id="active">0</strong></div><div><span>Total requested</span><strong id="total">0</strong></div></div><div class="controls"><label>Search applications<input id="search" type="search" placeholder="Member, number, guarantor..." oninput="render()"></label><label>Sort<select id="sort" onchange="render()"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="amount">Amount</option></select></label></div><div id="list"></div></section>
+      <section class="panel" id="repayments"><div class="heading"><div><div class="eyebrow">Collections</div><h2>Record a repayment</h2></div><span class="note">Payments are linked to a loan and saved in this browser.</span></div>
+        <form class="repayment-form" onsubmit="event.preventDefault();saveRepayment()"><label class="wide">Loan<select id="repayment-loan" required></select></label><label>Amount paid<input id="repayment-amount" type="number" min="0.01" step="0.01" required placeholder="0.00"></label><label>Payment date<input id="repayment-date" type="date" required></label><label>Payment method<select id="repayment-method"><option>Cash</option><option>Mobile money</option><option>Bank transfer</option><option>Other</option></select></label><label>Reference / receipt<input id="repayment-reference" type="text" placeholder="Optional reference"></label><div class="wide"><button class="btn btn-primary" type="submit">Save repayment</button></div></form>
+        <div class="repayment-list" id="repayment-list"></div>
+      </section>
+    </main>
+    <footer>WOBULENZI FINANCIAL PARTNERS · SACCO workspace</footer>
+  </div>
+  <script>
+    const KEY='saccoLoanRegisterV1';
+    const REPAYMENT_KEY='saccoLoanRepaymentsV1';
+    let loans=load();
+    let repayments=loadRepayments();
+    document.getElementById('repayment-date').value=new Date().toISOString().slice(0,10);
+    addRow(); addRow(); render();
+    function load(){try{const value=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(value)?value:[]}catch(error){console.warn('Unable to load loan applications.',error);return[]}}
+    function loadRepayments(){try{const value=JSON.parse(localStorage.getItem(REPAYMENT_KEY)||'[]');return Array.isArray(value)?value:[]}catch(error){console.warn('Unable to load repayments.',error);return[]}}
+    function esc(value){return String(value??'').replace(/[&<>"']/g,character=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]))}
+    function money(value){return new Intl.NumberFormat(undefined,{maximumFractionDigits:2}).format(Number(value)||0)}
+    function makeId(){return crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(16).slice(2)}`}
+    function addRow(){
+      const row=document.createElement('tr');
+      row.innerHTML=`<td class="row-number"></td><td><input data-field="number" aria-label="Member number" placeholder="SAC-001"></td><td><input data-field="name" class="member-name" aria-label="Member name" placeholder="Full name"></td><td><select data-field="product" aria-label="Loan product"><option>Development</option><option>Emergency</option><option>School fees</option><option>Asset finance</option><option>Business</option><option>Other</option></select></td><td><input data-field="amount" class="amount" aria-label="Requested amount" type="number" min="0.01" step="0.01" placeholder="0.00"></td><td><input data-field="rate" aria-label="Annual interest rate percent" type="number" min="0" step="0.01" placeholder="0"></td><td><input data-field="term" aria-label="Term in months" type="number" min="1" step="1" placeholder="12"></td><td><input data-field="date" aria-label="Application date" type="date" value="${new Date().toISOString().slice(0,10)}"></td><td><input data-field="guarantor" class="guarantor" aria-label="Guarantor" placeholder="Name / member no."></td><td><input data-field="notes" class="purpose" aria-label="Purpose and notes" placeholder="Loan purpose"></td><td><button class="remove-row" type="button" aria-label="Remove this row" onclick="removeRow(this)">Remove</button></td>`;
+      document.getElementById('loan-rows').appendChild(row);updateRowNumbers();
+    }
+    function removeRow(button){const row=button.closest('tr');if(row)row.remove();if(!document.querySelector('#loan-rows tr'))addRow();updateRowNumbers()}
+    function updateRowNumbers(){document.querySelectorAll('#loan-rows tr').forEach((row,index)=>row.querySelector('.row-number').textContent=index+1)}
+    function resetRows(){document.getElementById('loan-rows').innerHTML='';addRow();addRow()}
+    function saveBatch(){
+      const pending=[];
+      for(const row of document.querySelectorAll('#loan-rows tr')){
+        const value=(field)=>row.querySelector(`[data-field="${field}"]`).value.trim();
+        const number=value('number'),name=value('name'),amount=Number(value('amount')),date=value('date');
+        const isEmpty=!number&&!name&&!value('amount')&&!value('rate')&&!value('term')&&!value('guarantor')&&!value('notes');
+        if(isEmpty)continue;
+        if(!number||!name||!Number.isFinite(amount)||amount<=0||!date){alert(`Complete member number, name, requested amount, and date for row ${row.querySelector('.row-number').textContent}.`);return}
+        pending.push({id:makeId(),number,name,product:value('product'),amount,rate:Number(value('rate'))||0,term:Number(value('term'))||0,date,guarantor:value('guarantor'),notes:value('notes'),status:'Pending review',createdAt:new Date().toISOString()});
+      }
+      if(!pending.length){alert('Enter at least one complete loan application.');return}
+      try{loans=[...pending,...loans];localStorage.setItem(KEY,JSON.stringify(loans));resetRows();render();alert(`${pending.length} ${pending.length===1?'application':'applications'} saved.`)}catch(error){alert('Could not save the applications in browser storage. Please check available storage space.')}
+    }
+    function setStatus(id,status){const loan=loans.find(item=>item.id===id);if(!loan)return;loan.status=status;localStorage.setItem(KEY,JSON.stringify(loans));render()}
+    function render(){
+      renderRepayments();
+      const query=document.getElementById('search').value.trim().toLowerCase(),sort=document.getElementById('sort').value;
+      const rows=loans.filter(loan=>[loan.name,loan.number,loan.product,loan.guarantor,loan.status,loan.notes].some(value=>String(value||'').toLowerCase().includes(query)));
+      rows.sort((a,b)=>sort==='oldest'?String(a.date).localeCompare(String(b.date)):sort==='amount'?b.amount-a.amount:String(b.date).localeCompare(String(a.date)));
+      document.getElementById('count').textContent=`${rows.length} ${rows.length===1?'application':'applications'}`;
+      document.getElementById('pending').textContent=loans.filter(loan=>loan.status==='Pending review').length;
+      document.getElementById('approved').textContent=loans.filter(loan=>loan.status==='Approved').length;
+      document.getElementById('active').textContent=loans.filter(loan=>loan.status==='Active').length;
+      document.getElementById('total').textContent=money(loans.reduce((sum,loan)=>sum+(Number(loan.amount)||0),0));
+      document.getElementById('list').innerHTML=rows.length?`<div class="record-table-wrap"><table class="records-table loan-table"><thead><tr><th>Applied</th><th>Member</th><th>Product / purpose</th><th>Requested</th><th>Terms</th><th>Guarantor</th><th>Review status</th><th></th></tr></thead><tbody>${rows.map(loan=>`<tr><td>${esc(loan.date)}</td><td><strong>${esc(loan.name)}</strong><br><small>${esc(loan.number)}</small></td><td>${esc(loan.product)}${loan.notes?`<br><small>${esc(loan.notes)}</small>`:''}</td><td class="money">${money(loan.amount)}</td><td>${money(loan.rate)}% · ${loan.term||'—'} mo</td><td>${esc(loan.guarantor||'—')}</td><td><select aria-label="Status for ${esc(loan.name)}" onchange="setStatus('${esc(loan.id)}',this.value)">${['Pending review','Under appraisal','Pending approval','Approved','Declined','Active','Closed'].map(status=>`<option ${loan.status===status?'selected':''}>${status}</option>`).join('')}</select></td><td><button class="btn btn-secondary" type="button" onclick="removeLoan('${esc(loan.id)}')">Delete</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty-state"><strong>No loan applications found.</strong><p>Add an application or change your search.</p></div>';
+    }
+    function renderRepayments(){
+      const select=document.getElementById('repayment-loan'),previous=select.value;
+      const eligible=loans.filter(loan=>['Active','Approved'].includes(loan.status));
+      select.innerHTML='<option value="">Choose an approved or active loan</option>'+eligible.map(loan=>`<option value="${esc(loan.id)}">${esc(loan.name)} · ${esc(loan.number)} · ${money(loan.amount)}</option>`).join('');
+      if(eligible.some(loan=>loan.id===previous))select.value=previous;
+      const linked=repayments.map(payment=>({...payment,loan:loans.find(loan=>loan.id===payment.loanId)})).filter(payment=>payment.loan);
+      document.getElementById('repayment-list').innerHTML=linked.length?`<div class="record-table-wrap"><table class="records-table repayment-table"><thead><tr><th>Date</th><th>Member / loan</th><th>Amount</th><th>Method</th><th>Reference</th></tr></thead><tbody>${linked.sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(payment=>`<tr><td>${esc(payment.date)}</td><td><strong>${esc(payment.loan.name)}</strong><br><small>${esc(payment.loan.number)} · ${esc(payment.loan.product)}</small></td><td class="money">${money(payment.amount)}</td><td>${esc(payment.method)}</td><td>${esc(payment.reference||'—')}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty-state"><strong>No repayments recorded yet.</strong><p>Approved or active loans will appear in the loan selector.</p></div>';
+    }
+    function saveRepayment(){
+      const loanId=document.getElementById('repayment-loan').value,amount=Number(document.getElementById('repayment-amount').value),date=document.getElementById('repayment-date').value;
+      if(!loanId||!Number.isFinite(amount)||amount<=0||!date){alert('Choose a loan and enter a valid amount and payment date.');return}
+      const loan=loans.find(item=>item.id===loanId);if(!loan||!['Active','Approved'].includes(loan.status)){alert('Repayments can only be recorded against approved or active loans.');return}
+      const payment={id:makeId(),loanId,amount,date,method:document.getElementById('repayment-method').value,reference:document.getElementById('repayment-reference').value.trim(),createdAt:new Date().toISOString()};
+      try{repayments=[payment,...repayments];localStorage.setItem(REPAYMENT_KEY,JSON.stringify(repayments));document.getElementById('repayment-amount').value='';document.getElementById('repayment-reference').value='';renderRepayments();alert('Repayment saved.')}catch(error){alert('Could not save the repayment in browser storage. Please check available storage space.')}
+    }
+    function removeLoan(id){if(!confirm('Delete this loan application?'))return;loans=loans.filter(loan=>loan.id!==id);localStorage.setItem(KEY,JSON.stringify(loans));render()}
+    function csv(value){const text=String(value??'');return /[",\r\n]/.test(text)?`"${text.replace(/"/g,'""')}"`:text}
+    function exportCsv(){if(!loans.length){alert('No loan applications to export.');return}const keys=['number','name','product','amount','rate','term','date','guarantor','status','notes'];const header=['Member number','Member name','Product','Amount requested','Annual rate','Term months','Application date','Guarantor','Status','Notes'];const output=[header,...loans.map(loan=>keys.map(key=>loan[key]))].map(row=>row.map(csv).join(',')).join('\r\n');const link=document.createElement('a');link.href=URL.createObjectURL(new Blob(['\ufeff',output],{type:'text/csv'}));link.download='wobulenzi-loan-register.csv';link.click();setTimeout(()=>URL.revokeObjectURL(link.href),0)}
+  </script>
+  <script src="pwa.js"></script>
+<script src="nav.js"></script>
+<script src="module-sidebar.js"></script></body>
+</html>

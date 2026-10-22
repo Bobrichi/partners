@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Wobulenzi Financial Partners member self-service portal." />
+  <title>Member Portal - Wobulenzi Financial Partners</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .portal-page{max-width:1320px}.brand{text-decoration:none}.portal-hero .hero-content{padding:34px 38px}.eyebrow{color:#6879c9;font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.portal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.portal-grid .panel{height:100%}.portal-form{display:grid;gap:14px}.portal-form .field-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}.portal-form .btn{justify-self:start}.portal-message{min-height:1.3em;margin:12px 0 0;color:#596273;font-size:.8rem}.portal-message.error{color:#a33d3d}.portal-message.success{color:#23734f}.privacy-note{padding:13px 15px;color:#697386;background:#f6f7fb;border:1px solid #e8eaf0;border-radius:8px;font-size:.76rem;line-height:1.55}.privacy-note strong{color:#3d4657}.member-dashboard[hidden],.portal-auth[hidden]{display:none!important}.member-top{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:18px}.member-top h2{margin:2px 0;color:#263046}.member-top p{margin:0;color:#788294;font-size:.8rem}.balance-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:15px}.balance-card{padding:17px;background:#fff;border:1px solid #e4e7ed;border-radius:9px}.balance-card span,.balance-card strong{display:block}.balance-card span{color:#778194;font-size:.7rem}.balance-card strong{margin-top:6px;color:#3448ad;font-size:1.3rem}.balance-card small{display:block;margin-top:4px;color:#8991a0;font-size:.64rem}.portal-table{width:100%;border-collapse:collapse}.portal-table th,.portal-table td{padding:12px 10px;text-align:left;border-bottom:1px solid #eaecf1;font-size:.76rem}.portal-table th{color:#697386;background:#f7f8fa;font-size:.65rem;letter-spacing:.06em;text-transform:uppercase}.portal-table td{color:#586274}.portal-table td.amount{color:#3448ad;font-weight:800;white-space:nowrap}.portal-record-type{display:inline-flex;padding:4px 8px;border-radius:999px;color:#4054b5;background:#edf0ff;font-size:.65rem;font-weight:800}.portal-empty{padding:25px;color:#788294;text-align:center;border:1px dashed #d8dce5;border-radius:9px;background:#fafbfc}.portal-empty strong{display:block;color:#3b4352}.portal-empty p{margin:5px 0 0;font-size:.78rem}.portal-history-head{display:flex;align-items:end;justify-content:space-between;gap:14px;margin-bottom:14px}.portal-history-head h2{margin:0}.portal-history-head label{min-width:180px}.portal-logout{white-space:nowrap}@media(max-width:800px){.balance-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.portal-grid{grid-template-columns:1fr}}@media(max-width:520px){.portal-hero .hero-content{padding:24px 20px}.portal-form .field-pair{grid-template-columns:1fr}.member-top{align-items:flex-start}.portal-history-head{align-items:flex-start;flex-direction:column}.portal-history-head label{width:100%}}
+    #auth-area .portal-grid .panel{position:relative;overflow:hidden;padding:clamp(22px,3vw,32px);color:#f7f3e8;background:linear-gradient(145deg,rgba(21,29,35,.97),rgba(10,15,20,.98));border:1px solid rgba(234,195,109,.27);border-radius:14px;box-shadow:0 22px 55px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.035);animation:member-card-enter .7s ease both}#auth-area .portal-grid .panel:nth-child(2){animation-delay:.14s;border-color:rgba(234,195,109,.42)}#auth-area .portal-grid .panel::before{content:"";position:absolute;top:0;left:12%;right:12%;height:1px;background:linear-gradient(90deg,transparent,rgba(234,195,109,.7),transparent)}#auth-area .panel .eyebrow{color:#eac36d}#auth-area .panel h2{margin:7px 0 9px;color:#fff8e8;font-family:'Playfair Display',Georgia,serif;font-size:1.65rem}#auth-area .panel>p:not(.portal-message){color:#c4cbc8;font-size:.83rem;line-height:1.65}#auth-area .portal-form{position:relative;z-index:1;gap:15px}#auth-area .portal-form label{color:#efd28d}#auth-area .portal-form input{min-height:46px;color:#fff;background:#0b1116;border-color:rgba(235,222,191,.2);border-radius:7px}#auth-area .portal-form input::placeholder{color:#87918e}#auth-area .portal-form input:focus{border-color:#eac36d;outline:3px solid rgba(234,195,109,.16)}#auth-area .portal-form .btn-primary{color:#17130a;background:linear-gradient(135deg,#f2d68f,#d5a846);border-color:#eac36d}.portal-message{color:#c4cbc8}.portal-message.error{color:#ffaaa0}.portal-message.success{color:#9be1b7}.privacy-note{color:#c4cbc8;background:rgba(12,18,23,.86);border-color:rgba(234,195,109,.22)}.privacy-note strong{color:#efd28d}@keyframes member-card-enter{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  </style>
+  <meta name="theme-color" content="#d8ad50" />
+  <link rel="manifest" href="manifest.webmanifest" />
+</head>
+<body>
+  <div class="page-wrap portal-page">
+    <header><a class="brand" href="index.html"><img class="brand-logo" src="images/logo.jpeg" alt="Wobulenzi Financial Partners logo" /><span class="brand-name">WOBULENZI FINANCIAL PARTNERS<span class="small-text">Member portal</span></span></a><button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-navigation"><span></span><span></span><span></span></button><nav id="site-navigation" class="site-nav" aria-label="Member navigation"><a href="portal.html" aria-current="page">Member Portal</a><a href="admin.html">Administrator login</a></nav></header>
+    <section class="hero portal-hero"><div class="hero-content"><div class="eyebrow">Member self-service</div><h1>Your SACCO account</h1><p>Create a portal account using the member details already registered with Wobulenzi Financial Partners. After sign-in, view your saved savings balance and personal activity history.</p></div></section>
+    <main>
+      <section class="portal-auth" id="auth-area">
+        <div class="portal-grid">
+          <section class="panel"><div class="eyebrow">First time here?</div><h2>Create member account</h2><p>Use the same member number and email address held in your SACCO member profile.</p><form id="signup-form" class="portal-form" onsubmit="event.preventDefault();createPortalAccount()"><div class="field-pair"><label>Member number<input id="signup-number" required autocomplete="username" placeholder="e.g. WFP-001"></label><label>Registered email<input id="signup-email" type="email" required autocomplete="email" placeholder="name@example.com"></label></div><div class="field-pair"><label>Create password<input id="signup-password" type="password" required minlength="8" autocomplete="new-password" placeholder="At least 8 characters"></label><label>Confirm password<input id="signup-confirm" type="password" required minlength="8" autocomplete="new-password" placeholder="Enter it again"></label></div><button class="btn btn-primary" type="submit">Create portal account</button></form><p id="signup-message" class="portal-message" role="status" aria-live="polite"></p></section>
+          <section class="panel"><div class="eyebrow">Already registered?</div><h2>Sign in</h2><p>Sign in to view the savings and transactions linked to your member number.</p><form id="login-form" class="portal-form" onsubmit="event.preventDefault();signIn()"><label>Member number<input id="login-number" required autocomplete="username" placeholder="Your SACCO member number"></label><label>Password<input id="login-password" type="password" required autocomplete="current-password" placeholder="Your portal password"></label><button class="btn btn-primary" type="submit">Sign in</button></form><p id="login-message" class="portal-message" role="status" aria-live="polite"></p></section>
+        </div>
+      </section>
+
+      <section id="member-dashboard" class="member-dashboard" hidden>
+        <div class="member-top"><div><div class="eyebrow">Personal overview</div><h2 id="member-greeting">Welcome</h2><p id="member-identity"></p></div><button class="btn btn-secondary portal-logout" type="button" onclick="signOut()">Sign out</button></div>
+        <section class="balance-grid" aria-label="Your account summary"><article class="balance-card"><span>Member savings balance</span><strong id="personal-savings">—</strong><small id="savings-source"></small></article><article class="balance-card"><span>Share capital</span><strong id="personal-shares">—</strong><small>From member account record</small></article><article class="balance-card"><span>Outstanding loan balance</span><strong id="personal-loans">—</strong><small>From member account record</small></article><article class="balance-card"><span>Activity records</span><strong id="personal-activity-count">0</strong><small>Savings and member transactions</small></article></section>
+        <section class="panel"><div class="portal-history-head"><div><div class="eyebrow">Personal ledger</div><h2>Your savings & transactions</h2></div><label>Filter activity<select id="history-filter" onchange="renderHistory()"><option value="all">All activity</option><option value="savings">Savings entries</option><option value="transactions">Member transactions</option></select></label></div><div id="personal-history"></div></section>
+      </section>
+    </main>
+    <footer>WOBULENZI FINANCIAL PARTNERS · Member self-service</footer>
+  </div>
+  <script>
+    const PORTAL_KEY='wfpMemberPortalAccountsV1';
+    const MEMBER_KEY='saccoMemberWorkspaceV1';
+    const ACCOUNT_KEY='saccoMemberLedgerV1';
+    const SAVINGS_KEY='saccoSavingsLedgerV1';
+    const SESSION_KEY='wfpMemberPortalSessionV1';
+    let currentMember=null;
+    function getJson(key,fallback){try{return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback))}catch{return fallback}}
+    function setMessage(id,message,kind=''){const el=document.getElementById(id);el.textContent=message;el.className=`portal-message ${kind}`}
+    function normal(value){return String(value||'').trim().toLowerCase()}
+    function getRegisteredMember(number,email){
+      const profiles=getJson(MEMBER_KEY,{members:[]}).members||[];
+      const accountRecords=getJson(ACCOUNT_KEY,[]);
+      const candidates=[...profiles,...accountRecords.map(row=>({...row,number:row.number||row.memberNumber,name:row.name||row.memberName}))];
+      return candidates.find(member=>normal(member.number||member.memberNumber)===normal(number)&&normal(member.email)===normal(email));
+    }
+    function accountList(){return getJson(PORTAL_KEY,[])}
+    function saveAccountList(accounts){localStorage.setItem(PORTAL_KEY,JSON.stringify(accounts))}
+    function bytesToHex(bytes){return [...new Uint8Array(bytes)].map(byte=>byte.toString(16).padStart(2,'0')).join('')}
+    async function hashPassword(password,salt){if(!crypto.subtle)throw new Error('Secure browser password hashing is unavailable here. Open the site in a modern browser over localhost or HTTPS.');const material=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveBits']);const saltBytes=new Uint8Array((salt.match(/../g)||[]).map(byte=>parseInt(byte,16)));const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:saltBytes,iterations:210000,hash:'SHA-256'},material,256);return bytesToHex(bits)}
+    function newSalt(){const bytes=crypto.getRandomValues(new Uint8Array(16));return [...bytes].map(byte=>byte.toString(16).padStart(2,'0')).join('')}
+    async function createPortalAccount(){
+      const number=document.getElementById('signup-number').value.trim(),email=document.getElementById('signup-email').value.trim(),password=document.getElementById('signup-password').value,confirmPassword=document.getElementById('signup-confirm').value;
+      if(password.length<8){setMessage('signup-message','Choose a password with at least 8 characters.','error');return}
+      if(password!==confirmPassword){setMessage('signup-message','The passwords do not match.','error');return}
+      const member=getRegisteredMember(number,email);if(!member){setMessage('signup-message','We could not match that member number and email to a registered member profile. Contact the SACCO office to check your details.','error');return}
+      const accounts=accountList();if(accounts.some(account=>normal(account.memberNumber)===normal(number))){setMessage('signup-message','A portal account already exists for this member number. Please sign in.','error');return}
+      try{const salt=newSalt(),passwordHash=await hashPassword(password,salt);accounts.push({memberNumber:number,email:normal(email),salt,passwordHash,createdAt:new Date().toISOString()});saveAccountList(accounts);sessionStorage.setItem(SESSION_KEY,number);document.getElementById('signup-form').reset();setMessage('signup-message','Account created. Opening your member overview.','success');openMemberView(number)}catch(error){setMessage('signup-message',error.message||'Could not create the portal account in this browser.','error')}
+    }
+    async function signIn(){
+      const number=document.getElementById('login-number').value.trim(),password=document.getElementById('login-password').value;
+      const account=accountList().find(item=>normal(item.memberNumber)===normal(number));
+      if(!account){setMessage('login-message','No portal account was found for that member number. Create an account first.','error');return}
+      try{const hash=await hashPassword(password,account.salt);if(hash!==account.passwordHash){setMessage('login-message','The member number or password is incorrect.','error');return}sessionStorage.setItem(SESSION_KEY,account.memberNumber);document.getElementById('login-form').reset();setMessage('login-message','Signed in.','success');openMemberView(account.memberNumber)}catch(error){setMessage('login-message',error.message||'Could not sign in.','error')}
+    }
+    function esc(value){return String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]))}
+    function money(value){return new Intl.NumberFormat(undefined,{maximumFractionDigits:2}).format(Number(value)||0)}
+    function showAmount(value){return value===undefined||value===null||value===''?'Not recorded':money(value)}
+    function dateLabel(value){if(!value)return '—';const date=new Date(String(value).length===10?`${value}T00:00:00`:value);return Number.isNaN(date.getTime())?'—':date.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})}
+    function openMemberView(number){
+      const profiles=getJson(MEMBER_KEY,{members:[]}).members||[],accountRows=getJson(ACCOUNT_KEY,[]);
+      currentMember=profiles.find(member=>normal(member.number)===normal(number))||accountRows.find(member=>normal(member.number)===normal(number));
+      if(!currentMember){signOut();return}
+      document.getElementById('auth-area').hidden=true;document.getElementById('member-dashboard').hidden=false;
+      document.getElementById('member-greeting').textContent=`Welcome, ${currentMember.name||currentMember.memberName||'member'}`;
+      document.getElementById('member-identity').textContent=`Member number ${currentMember.number||currentMember.memberNumber}${currentMember.status?` · ${currentMember.status}`:''}`;
+      const account=accountRows.find(row=>normal(row.number||row.memberNumber)===normal(number));
+      document.getElementById('personal-savings').textContent=showAmount(account?.savings);
+      document.getElementById('personal-shares').textContent=showAmount(account?.shares);
+      document.getElementById('personal-loans').textContent=showAmount(account?.loanBalance);
+      document.getElementById('savings-source').textContent=account?'Account register balance':'No account balance has been entered';
+      renderHistory();
+    }
+    function getHistory(){
+      if(!currentMember)return[];
+      const number=normal(currentMember.number||currentMember.memberNumber),profileData=getJson(MEMBER_KEY,{members:[]}).members||[];
+      const profile=profileData.find(member=>normal(member.number)===number)||currentMember;
+      const entries=[];
+      getJson(SAVINGS_KEY,[]).filter(entry=>normal(entry.memberNumber)===number).forEach(entry=>entries.push({date:entry.date||entry.createdAt,type:entry.type||'Savings activity',details:[entry.reference,entry.notes].filter(Boolean).join(' · '),method:entry.method||'',amount:Number(entry.amount)||0,source:'savings'}));
+      (profile.activities?.transactions||[]).forEach(entry=>entries.push({date:entry.date||entry.createdAt,type:entry.type||'Transaction',details:[entry.title,entry.notes].filter(Boolean).join(' · '),method:entry.method||'',amount:Number(entry.amount)||0,source:'transactions'}));
+      return entries.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+    }
+    function renderHistory(){
+      const filter=document.getElementById('history-filter').value;
+      const all=getHistory(),visible=all.filter(entry=>filter==='all'||entry.source===filter);
+      document.getElementById('personal-activity-count').textContent=all.length;
+      if(!visible.length){document.getElementById('personal-history').innerHTML='<div class="portal-empty"><strong>No activity has been recorded yet.</strong><p>Your savings entries and member transactions will appear here.</p></div>';return}
+      document.getElementById('personal-history').innerHTML=`<div class="record-table-wrap"><table class="portal-table"><thead><tr><th>Date</th><th>Activity</th><th>Details / method</th><th>Amount</th><th>Record source</th></tr></thead><tbody>${visible.map(entry=>`<tr><td>${dateLabel(entry.date)}</td><td><span class="portal-record-type">${esc(entry.type)}</span></td><td>${esc([entry.details,entry.method].filter(Boolean).join(' · ')||'—')}</td><td class="amount">${money(entry.amount)}</td><td>${entry.source==='savings'?'Savings ledger':'Member transaction'}</td></tr>`).join('')}</tbody></table></div>`;
+    }
+    function signOut(){sessionStorage.removeItem(SESSION_KEY);currentMember=null;document.getElementById('auth-area').hidden=false;document.getElementById('member-dashboard').hidden=true;document.getElementById('history-filter').value='all'}
+    const remembered=sessionStorage.getItem(SESSION_KEY);if(remembered){const exists=accountList().some(account=>normal(account.memberNumber)===normal(remembered));if(exists)openMemberView(remembered);else signOut()}
+  </script>
+  <script src="pwa.js"></script>
+<script src="nav.js"></script>
+</body>
+</html>

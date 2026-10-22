@@ -1,0 +1,327 @@
+
+<style>
+    :root {
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-strong: #212223;
+      --text: #1f2937;
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --shadow: 0 20px 45px rgba(245, 246, 249, 0.08);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #0f1013 0%, #f9fafb 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .page-wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+      padding: 18px 24px;
+      background: rgba(255,255,255,0.88);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      margin-bottom: 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+
+    .brand span {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 1.1rem;
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+    }
+
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    nav a:hover {
+      color: var(--accent);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .hero-content {
+      background: var(--surface);
+      border-radius: 28px;
+      padding: 36px 34px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-content h1 {
+      margin: 0 0 18px;
+      font-size: clamp(2.25rem, 4vw, 3.5rem);
+      line-height: 1.02;
+    }
+
+    .hero-content p {
+      margin: 0 0 24px;
+      max-width: 760px;
+      color: #475569;
+    }
+
+    .hero-cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 24px;
+      border-radius: 999px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: rgb(80, 75, 75);
+      box-shadow: 0 18px 30px rgba(37, 99, 235, 0.18);
+    }
+
+    .btn-secondary {
+      background: var(--surface-strong);
+      color: var(--text);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(160px, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .stat-card {
+      padding: 22px;
+      border-radius: 24px;
+      background: var(--surface-strong);
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.05);
+    }
+
+    .stat-card strong {
+      display: block;
+      font-size: 1.75rem;
+      margin-bottom: 8px;
+      color: var(--accent);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      margin-bottom: 18px;
+      font-size: 1.5rem;
+    }
+
+    .field-group {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 16px;
+      padding: 14px 16px;
+      font-size: 1rem;
+      background: #292727;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(8, 8, 8, 0.12);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 96px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .controls .search-wrapper {
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .controls input[type="search"] {
+      width: 100%;
+    }
+
+    .records-table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow-x: auto;
+      display: block;
+    }
+
+    .records-table th,
+    .records-table td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .records-table th {
+      background: #f8fafc;
+      font-weight: 700;
+    }
+
+    .records-table tbody tr:hover {
+      background: #f8fbff;
+    }
+
+    .tag {
+      display: inline-flex;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      background: #e0e7ff;
+    }
+
+    .empty-state {
+      padding: 36px;
+      text-align: center;
+      color: #475569;
+      border: 2px dashed #cbd5e1;
+      border-radius: 24px;
+      background: #ffffff;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .small-text {
+      color: #64748b;
+      font-size: 0.95rem;
+    }
+
+    footer {
+      margin-top: 24px;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.95rem;
+    }
+
+    @media (min-width: 920px) {
+      .hero {
+        grid-template-columns: 1.1fr 0.9fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(3, minmax(200px, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      header,
+      .hero-content,
+      .panel {
+        padding: 22px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      </style>
+    }

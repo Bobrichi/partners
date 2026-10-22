@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Savings Ledger - Wobulenzi Financial Partners</title>
+  <script src="access.js"></script><link rel="stylesheet" href="styles.css" />
+  <style>
+    .workspace{max-width:1400px}.brand{text-decoration:none}.eyebrow{color:#6879c9;font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.heading{display:flex;justify-content:space-between;align-items:end;gap:14px;margin-bottom:20px}.heading h2{margin:0}.note{color:#858c99;font-size:.78rem}.form-section{padding:17px 0;border-top:1px solid #edf0f4}.batch-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.batch-toolbar p{margin:0;color:#737c8c;font-size:.77rem}.batch-scroll{width:100%;overflow:auto;border:1px solid #e8eaf0;border-radius:8px}.batch-table{width:100%;min-width:1060px;border-collapse:collapse}.batch-table th,.batch-table td{padding:9px;border-bottom:1px solid #edf0f4;text-align:left}.batch-table th{color:#657084;background:#f7f8fb;font-size:.65rem;text-transform:uppercase;letter-spacing:.06em}.batch-table input,.batch-table select{min-width:110px;min-height:38px;padding:8px;font-size:.78rem}.batch-table .name-input{min-width:165px}.batch-table .ref-input{min-width:150px}.batch-table .amount-input{min-width:115px}.row-number{width:35px;color:#8790a0;text-align:center;font-size:.75rem}.remove-row{padding:7px 9px;color:#a44c4c;background:#fff;border:1px solid #ead9d9;border-radius:6px;font:inherit;font-size:.72rem;cursor:pointer}.batch-actions{display:flex;justify-content:space-between;gap:12px;margin-top:14px}.batch-actions .right-actions{display:flex;gap:9px}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:10px 0 18px}.summary div{padding:15px;background:#f8f9fc;border:1px solid #e8eaf0;border-radius:8px}.summary span,.summary strong{display:block}.summary span{color:#737c8c;font-size:.72rem}.summary strong{margin-top:4px;color:#3448ad;font-size:1.2rem}.controls{display:flex;align-items:end;gap:14px;margin-bottom:16px}.controls label:first-child{flex:1}.ledger th,.ledger td{white-space:nowrap}.ledger td:nth-child(6){white-space:normal;min-width:170px}.@media(max-width:620px){.summary{grid-template-columns:1fr}.heading{display:block}.controls{align-items:stretch;flex-direction:column}.batch-actions{align-items:stretch;flex-direction:column}.batch-actions .right-actions{justify-content:flex-end}}
+  </style>
+  <meta name="theme-color" content="#d8ad50" />
+  <link rel="manifest" href="manifest.webmanifest" />
+<link rel="stylesheet" href="module-sidebar.css"></head>
+<body>
+  <div class="page-wrap workspace">
+    <header><a class="brand" href="dashboard.html"><img class="brand-logo" src="images/logo.jpeg" alt="Wobulenzi Financial Partners logo" /><span class="brand-name">WOBULENZI FINANCIAL PARTNERS<span class="small-text">Savings ledger</span></span></a><button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-navigation"><span></span><span></span><span></span></button><nav id="site-navigation" class="site-nav"><a href="dashboard.html">Dashboard</a><a href="members.html">Members</a><a href="records.html">Records</a><a href="savings.html" aria-current="page">Savings</a><a href="loans.html">Loans</a><a href="reports.html">Reports</a><a href="portal.html">Member Portal</a></nav></header>
+    <section class="hero"><div class="hero-content"><div class="eyebrow">Member deposits and withdrawals</div><h1>Savings ledger</h1><p>Enter savings activity for several members in one batch. Each completed row is saved as a separate ledger entry.</p><div class="hero-cta"><a class="btn btn-primary" href="#entry-form">Record activity</a><button class="btn btn-secondary" onclick="exportCsv()" type="button">Export CSV</button></div></div></section>
+    <main>
+      <section class="panel" id="entry-form">
+        <div class="heading"><div><div class="eyebrow">Batch entry</div><h2>Record member activity</h2></div><span class="note">Add one row per member transaction.</span></div>
+        <form id="form" onsubmit="event.preventDefault();saveBatch()">
+          <div class="form-section">
+            <div class="batch-toolbar"><p>Complete the required fields in each row. Empty rows are ignored.</p><button class="btn btn-secondary" type="button" onclick="addRow()">+ Add another member</button></div>
+            <div class="batch-scroll"><table class="batch-table"><thead><tr><th>#</th><th>Member number *</th><th>Member name *</th><th>Entry type</th><th>Amount *</th><th>Date *</th><th>Payment method</th><th>Receipt / reference</th><th></th></tr></thead><tbody id="entry-rows"></tbody></table></div>
+            <div class="batch-actions"><button class="btn btn-secondary" type="button" onclick="resetRows()">Clear rows</button><div class="right-actions"><button class="btn btn-primary" type="submit">Save all entries</button></div></div>
+          </div>
+        </form>
+      </section>
+      <section class="panel"><div class="heading"><div><div class="eyebrow">Ledger</div><h2>Savings activity</h2></div><span class="note" id="count">0 entries</span></div><div class="summary"><div><span>Deposits & credits</span><strong id="credits">0</strong></div><div><span>Withdrawals & fees</span><strong id="debits">0</strong></div><div><span>Net recorded movement</span><strong id="net">0</strong></div></div><div class="controls"><label>Search ledger<input id="search" type="search" placeholder="Member, number, reference..." oninput="render()"></label><label>Sort<select id="sort" onchange="render()"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="amount">Amount</option></select></label></div><div id="list"></div></section>
+    </main>
+    <footer>WOBULENZI FINANCIAL PARTNERS · SACCO workspace</footer>
+  </div>
+  <script>
+    const KEY='saccoSavingsLedgerV1';
+    let entries=read();
+    addRow(); addRow(); render();
+    function read(){try{const value=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(value)?value:[]}catch(error){console.warn('Unable to load savings entries.',error);return[]}}
+    function esc(value){return String(value??'').replace(/[&<>"']/g,character=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]))}
+    function money(value){return new Intl.NumberFormat(undefined,{maximumFractionDigits:2}).format(Number(value)||0)}
+    function makeId(){return crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(16).slice(2)}`}
+    function addRow(){
+      const body=document.getElementById('entry-rows');
+      const row=document.createElement('tr');
+      row.innerHTML=`<td class="row-number"></td><td><input data-field="memberNumber" aria-label="Member number" placeholder="SAC-001"></td><td><input data-field="memberName" class="name-input" aria-label="Member name" placeholder="Full name"></td><td><select data-field="type" aria-label="Entry type"><option>Deposit</option><option>Withdrawal</option><option>Share contribution</option><option>Interest credit</option><option>Fee</option></select></td><td><input data-field="amount" class="amount-input" aria-label="Amount" type="number" min="0.01" step="0.01" placeholder="0.00"></td><td><input data-field="date" aria-label="Date" type="date" value="${new Date().toISOString().slice(0,10)}"></td><td><select data-field="method" aria-label="Payment method"><option>Cash</option><option>Mobile money</option><option>Bank transfer</option><option>Cheque</option><option>Other</option></select></td><td><input data-field="reference" class="ref-input" aria-label="Receipt or reference" placeholder="Receipt / code"></td><td><button class="remove-row" type="button" aria-label="Remove this row" onclick="removeRow(this)">Remove</button></td>`;
+      body.appendChild(row); updateRowNumbers();
+    }
+    function removeRow(button){const row=button.closest('tr');if(row)row.remove();if(!document.querySelector('#entry-rows tr'))addRow();updateRowNumbers()}
+    function updateRowNumbers(){document.querySelectorAll('#entry-rows tr').forEach((row,index)=>row.querySelector('.row-number').textContent=index+1)}
+    function resetRows(){document.getElementById('entry-rows').innerHTML='';addRow();addRow()}
+    function saveBatch(){
+      const rows=[...document.querySelectorAll('#entry-rows tr')];
+      const pending=[];
+      for(const row of rows){
+        const value=(field)=>row.querySelector(`[data-field="${field}"]`).value.trim();
+        const memberNumber=value('memberNumber'),memberName=value('memberName'),amount=Number(value('amount')),date=value('date');
+        const isEmpty=!memberNumber&&!memberName&&!value('amount')&&!value('reference');
+        if(isEmpty)continue;
+        if(!memberNumber||!memberName||!Number.isFinite(amount)||amount<=0||!date){alert(`Complete member number, name, amount, and date for row ${row.querySelector('.row-number').textContent}.`);return}
+        pending.push({id:makeId(),memberNumber,memberName,type:value('type'),amount,date,method:value('method'),reference:value('reference'),notes:'',createdAt:new Date().toISOString()});
+      }
+      if(!pending.length){alert('Enter at least one complete member savings entry.');return}
+      try{entries=[...pending,...entries];localStorage.setItem(KEY,JSON.stringify(entries));resetRows();render();alert(`${pending.length} ${pending.length===1?'entry':'entries'} saved.`)}catch(error){alert('Could not save the entries in browser storage. Please check available storage space.')}
+    }
+    function render(){
+      const query=document.getElementById('search').value.trim().toLowerCase(),order=document.getElementById('sort').value;
+      const rows=entries.filter(entry=>[entry.memberNumber,entry.memberName,entry.type,entry.reference,entry.notes].some(value=>String(value||'').toLowerCase().includes(query)));
+      rows.sort((a,b)=>order==='oldest'?String(a.date).localeCompare(String(b.date)):order==='amount'?b.amount-a.amount:String(b.date).localeCompare(String(a.date)));
+      const credits=entries.filter(entry=>['Deposit','Share contribution','Interest credit'].includes(entry.type)).reduce((sum,entry)=>sum+Number(entry.amount||0),0);
+      const debits=entries.filter(entry=>['Withdrawal','Fee'].includes(entry.type)).reduce((sum,entry)=>sum+Number(entry.amount||0),0);
+      document.getElementById('credits').textContent=money(credits);document.getElementById('debits').textContent=money(debits);document.getElementById('net').textContent=money(credits-debits);document.getElementById('count').textContent=`${rows.length} ${rows.length===1?'entry':'entries'}`;
+      document.getElementById('list').innerHTML=rows.length?`<div class="record-table-wrap"><table class="records-table ledger"><thead><tr><th>Date</th><th>Member</th><th>Type</th><th>Amount</th><th>Method</th><th>Reference / notes</th><th></th></tr></thead><tbody>${rows.map(entry=>`<tr><td>${esc(entry.date)}</td><td>${esc(entry.memberName)}<br><small>${esc(entry.memberNumber)}</small></td><td>${esc(entry.type)}</td><td class="money">${money(entry.amount)}</td><td>${esc(entry.method)}</td><td>${esc([entry.reference,entry.notes].filter(Boolean).join(' · ')||'—')}</td><td><button class="btn btn-secondary" onclick="removeEntry('${esc(entry.id)}')" type="button">Delete</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty-state"><strong>No savings activity found.</strong><p>Add an entry or change your search.</p></div>';
+    }
+    function removeEntry(id){if(!confirm('Delete this savings entry?'))return;entries=entries.filter(entry=>entry.id!==id);localStorage.setItem(KEY,JSON.stringify(entries));render()}
+    function csv(value){const text=String(value??'');return /[",\r\n]/.test(text)?`"${text.replace(/"/g,'""')}"`:text}
+    function exportCsv(){if(!entries.length){alert('No savings entries to export.');return}const header=['Date','Member number','Member name','Type','Amount','Method','Reference','Notes'];const output=[header,...entries.map(entry=>[entry.date,entry.memberNumber,entry.memberName,entry.type,entry.amount,entry.method,entry.reference,entry.notes])].map(row=>row.map(csv).join(',')).join('\r\n');const link=document.createElement('a');link.href=URL.createObjectURL(new Blob(['\ufeff',output],{type:'text/csv'}));link.download='wobulenzi-savings-ledger.csv';link.click();setTimeout(()=>URL.revokeObjectURL(link.href),0)}
+  </script>
+  <script src="pwa.js"></script>
+<script src="nav.js"></script>
+<script src="module-sidebar.js"></script></body>
+</html>

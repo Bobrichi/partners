@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Manage SACCO member profiles, logbook entries, loans, and transactions." />
+  <title>Members - Wobulenzi Financial Partners</title>
+  <script src="access.js"></script><link rel="stylesheet" href="styles.css" />
+  <meta name="theme-color" content="#d8ad50" />
+  <link rel="manifest" href="manifest.webmanifest" />
+<link rel="stylesheet" href="module-sidebar.css"></head>
+<body>
+  <div class="page-wrap member-page">
+    <header>
+      <a class="brand" href="dashboard.html" aria-label="Wobulenzi Financial Partners home"><img class="brand-logo" src="images/logo.jpeg" alt="Wobulenzi Financial Partners logo" />
+        <span class="brand-name">WOBULENZI FINANCIAL PARTNERS<span class="small-text">SACCO member workspace</span></span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-navigation"><span></span><span></span><span></span></button><nav id="site-navigation" class="site-nav" aria-label="Main navigation"><a href="dashboard.html">Dashboard</a><a href="members.html" aria-current="page">Members</a><a href="records.html">Records</a><a href="savings.html">Savings</a><a href="loans.html">Loans</a><a href="reports.html">Reports</a><a href="portal.html">Member Portal</a></nav>
+    </header>
+
+    <section class="hero member-hero"><div class="hero-content">
+      <div class="eyebrow">Member management</div><h1>Members</h1>
+      <p>Keep each member’s personal profile, activity logbook, loans, and financial transactions together in one searchable register.</p>
+      <div class="hero-cta"><a class="btn btn-primary" href="#member-form">Add a member</a><button class="btn btn-secondary" type="button" onclick="exportData()">Export member data</button></div>
+    </div></section>
+
+    <main>
+      <section class="panel" id="member-form">
+        <div class="section-heading"><div><div class="eyebrow">Member profile</div><h2>Add member information</h2></div><span class="section-note">Name and member number are required</span></div>
+        <form id="profile-form" onsubmit="event.preventDefault(); addMember()">
+          <div class="form-section"><h3>Personal details</h3><div class="form-grid">
+            <label>Full name *<input id="member-name" required placeholder="Member’s full name" /></label>
+            <label>Member number *<input id="member-number" required placeholder="e.g. SAC-001" /></label>
+            <label>National ID / passport<input id="member-id-number" placeholder="Identification number" /></label>
+            <label>Date of birth<input id="member-dob" type="date" /></label>
+            <label>Gender<select id="member-gender"><option value="">Choose if recorded</option><option>Female</option><option>Male</option><option>Prefer not to say</option></select></label>
+            <label>Marital status<select id="member-marital"><option value="">Choose if recorded</option><option>Single</option><option>Married</option><option>Other</option></select></label>
+            <label>Phone<input id="member-phone" type="tel" placeholder="Phone number" /></label>
+            <label>Email<input id="member-email" type="email" placeholder="name@example.com" /></label>
+            <label>Occupation<input id="member-occupation" placeholder="Occupation or employer" /></label>
+            <label>Membership date<input id="member-joined" type="date" /></label>
+            <label>Status<select id="member-status"><option>Active</option><option>Dormant</option><option>Exited</option></select></label>
+            <label>Next of kin<input id="member-kin" placeholder="Name and relationship" /></label>
+            <label class="span-2">Address<textarea id="member-address" rows="2" placeholder="Home or postal address"></textarea></label>
+            <label class="span-2">Profile notes<textarea id="member-notes" rows="2" placeholder="Additional member information"></textarea></label>
+          </div></div>
+          <div class="actions form-actions"><button class="btn btn-secondary" type="reset">Clear form</button><button class="btn btn-primary" type="submit">Save member</button></div>
+        </form>
+      </section>
+
+      <section class="panel member-register-link"><div class="section-heading"><div><div class="eyebrow">Member register</div><h2>Browse member records</h2></div></div><p>Search and monitor all member profiles from the Records page.</p><a class="btn btn-primary" href="records.html#member-register">Open member register</a></section>
+
+      <section class="panel" id="member-workspace">
+        <div class="section-heading"><div><div class="eyebrow">Selected member file</div><h2 id="selected-member-title">Choose a member</h2></div><span id="selected-member-meta" class="section-note">Select a member from the register to view or add activity.</span></div>
+        <div id="member-detail-empty" class="empty-state"><strong>No member selected.</strong><p>Choose a member above. Their logbook, loans, and transactions will appear here.</p></div>
+        <div id="member-detail" hidden>
+          <div class="member-summary" id="member-summary"></div>
+          <div class="activity-tabs" role="tablist" aria-label="Member records">
+            <button class="activity-tab active" type="button" role="tab" aria-selected="true" data-kind="logbook" onclick="showActivity('logbook')">Logbook</button>
+            <button class="activity-tab" type="button" role="tab" aria-selected="false" data-kind="loans" onclick="showActivity('loans')">Loans</button>
+            <button class="activity-tab" type="button" role="tab" aria-selected="false" data-kind="transactions" onclick="showActivity('transactions')">Transactions</button>
+          </div>
+          <div class="activity-layout">
+            <form id="activity-form" class="activity-form" onsubmit="event.preventDefault(); addActivity()"></form>
+            <div class="activity-list-wrap"><div class="activity-list-heading"><h3 id="activity-list-title">Logbook entries</h3><label>Sort<select id="activity-sort" onchange="renderActivity()"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="amount">Amount</option></select></label></div><div id="activity-list"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="member-summary-panel"><div class="section-heading"><div><div class="eyebrow">Portfolio overview</div><h2>Member summary</h2></div></div>
+        <div class="stats-summary-grid">
+          <div class="summary-item"><div class="summary-label">Members</div><div class="summary-value" id="summary-members">0</div></div>
+          <div class="summary-item"><div class="summary-label">Active members</div><div class="summary-value" id="summary-active">0</div></div>
+          <div class="summary-item"><div class="summary-label">Loan records</div><div class="summary-value" id="summary-loans">0</div></div>
+          <div class="summary-item"><div class="summary-label">Transactions logged</div><div class="summary-value" id="summary-transactions">0</div></div>
+        </div>
+      </section>
+    </main>
+    <footer>WOBULENZI FINANCIAL PARTNERS <span aria-hidden="true">·</span> Contact: <a href="tel:+256704696419">+256 704 696 419</a></footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'saccoMemberWorkspaceV1';
+    const activityKinds = {
+      logbook: { title: 'Logbook entries', fields: [
+        { id: 'activity-date', label: 'Date', type: 'date', required: true },
+        { id: 'activity-title', label: 'Entry title', placeholder: 'Meeting, visit, follow-up...', required: true },
+        { id: 'activity-category', label: 'Type', select: ['Meeting', 'Contact', 'Document', 'Follow-up', 'Other'] },
+        { id: 'activity-notes', label: 'Details', textarea: true, placeholder: 'Record the member interaction or note' }
+      ] },
+      loans: { title: 'Loan records', fields: [
+        { id: 'activity-date', label: 'Application / issue date', type: 'date', required: true },
+        { id: 'activity-title', label: 'Loan description', placeholder: 'Loan purpose or reference', required: true },
+        { id: 'activity-amount', label: 'Principal amount', type: 'number', min: '0', step: '0.01', required: true },
+        { id: 'activity-rate', label: 'Interest rate (%)', type: 'number', min: '0', step: '0.01', placeholder: '0' },
+        { id: 'activity-due', label: 'Due date', type: 'date' },
+        { id: 'activity-status', label: 'Loan status', select: ['Pending', 'Approved', 'Active', 'Repaid', 'Defaulted'] },
+        { id: 'activity-notes', label: 'Notes', textarea: true, placeholder: 'Terms, guarantors, or other details' }
+      ] },
+      transactions: { title: 'Transactions', fields: [
+        { id: 'activity-date', label: 'Transaction date', type: 'date', required: true },
+        { id: 'activity-title', label: 'Description / reference', placeholder: 'Savings deposit, withdrawal, repayment...', required: true },
+        { id: 'activity-type', label: 'Transaction type', select: ['Deposit', 'Withdrawal', 'Loan disbursement', 'Loan repayment', 'Share contribution', 'Fee', 'Other'] },
+        { id: 'activity-amount', label: 'Amount', type: 'number', min: '0', step: '0.01', required: true },
+        { id: 'activity-method', label: 'Payment method / reference', placeholder: 'Cash, mobile money, receipt number...' },
+        { id: 'activity-notes', label: 'Notes', textarea: true, placeholder: 'Additional transaction details' }
+      ] }
+    };
+    let data = loadData();
+    let selectedId = null;
+    let activeKind = 'logbook';
+    selectedId = new URLSearchParams(location.search).get('member');
+    if (selectedId && !data.members.some((member) => member.id === selectedId)) selectedId = null;
+    renderMembers();
+    renderSummary();
+    renderSelectedMember();
+
+    function loadData() {
+      try { const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{"members":[]}'); return { members: Array.isArray(saved.members) ? saved.members : [] }; }
+      catch (error) { console.warn('Could not load member workspace.', error); return { members: [] }; }
+    }
+    function persist() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); renderMembers(); renderSummary(); if (selectedId) renderSelectedMember(); }
+      catch (error) { alert('Could not save this information in browser storage. Please check available storage space.'); }
+    }
+    function val(id) { return document.getElementById(id).value.trim(); }
+    function uid() { return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`; }
+    function addMember() {
+      const member = {
+        id: uid(), name: val('member-name'), number: val('member-number'), idNumber: val('member-id-number'), dob: val('member-dob'), gender: val('member-gender'), marital: val('member-marital'),
+        phone: val('member-phone'), email: val('member-email'), occupation: val('member-occupation'), joined: val('member-joined'), status: val('member-status'), kin: val('member-kin'), address: val('member-address'), notes: val('member-notes'), createdAt: new Date().toISOString(), activities: { logbook: [], loans: [], transactions: [] }
+      };
+      if (data.members.some((item) => item.number.toLowerCase() === member.number.toLowerCase())) { alert('That member number is already in the register.'); document.getElementById('member-number').focus(); return; }
+      data.members.unshift(member); selectedId = member.id; document.getElementById('profile-form').reset(); persist(); document.getElementById('member-workspace').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[char]); }
+    function formatDate(value) { if (!value) return '—'; const d = new Date(value + (value.length === 10 ? 'T00:00:00' : '')); return Number.isNaN(d.getTime()) ? escapeHtml(value) : d.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' }); }
+    function amount(value) { return new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(Number(value) || 0); }
+    function renderMembers() {}
+    function selectMember(id) { selectedId = id; renderMembers(); renderSelectedMember(); document.getElementById('member-workspace').scrollIntoView({ behavior:'smooth', block:'start' }); }
+    function currentMember() { return data.members.find((member) => member.id === selectedId); }
+    function renderSelectedMember() {
+      const member = currentMember();
+      document.getElementById('member-detail-empty').hidden = !!member;
+      document.getElementById('member-detail').hidden = !member;
+      if (!member) { document.getElementById('selected-member-title').textContent = 'Choose a member'; document.getElementById('selected-member-meta').textContent = 'Select a member from the register to view or add activity.'; return; }
+      document.getElementById('selected-member-title').textContent = member.name;
+      document.getElementById('selected-member-meta').textContent = `Member ${member.number} · ${member.status}`;
+      const details = [['Phone',member.phone],['Email',member.email],['ID / passport',member.idNumber],['Date of birth',member.dob ? formatDate(member.dob) : ''],['Gender',member.gender],['Occupation',member.occupation],['Address',member.address],['Next of kin',member.kin]];
+      document.getElementById('member-summary').innerHTML = details.filter(([,value]) => value).map(([label,value]) => `<div><span>${label}</span><strong>${escapeHtml(value)}</strong></div>`).join('') || '<p>No additional profile details saved.</p>';
+      document.querySelectorAll('.activity-tab').forEach((tab) => { const active = tab.dataset.kind === activeKind; tab.classList.toggle('active', active); tab.setAttribute('aria-selected', String(active)); });
+      renderActivityForm(); renderActivity();
+    }
+    function showActivity(kind) { activeKind = kind; renderSelectedMember(); }
+    function renderActivityForm() {
+      const config = activityKinds[activeKind];
+      document.getElementById('activity-list-title').textContent = config.title;
+      const controls = config.fields.map((field) => {
+        const id = `id="${field.id}"`;
+        const req = field.required ? 'required' : '';
+        if (field.select) return `<label>${field.label}<select ${id}>${field.select.map((option) => `<option>${escapeHtml(option)}</option>`).join('')}</select></label>`;
+        if (field.textarea) return `<label class="activity-span">${field.label}<textarea ${id} rows="3" placeholder="${escapeHtml(field.placeholder || '')}"></textarea></label>`;
+        return `<label>${field.label}<input ${id} type="${field.type || 'text'}" ${field.min ? `min="${field.min}"` : ''} ${field.step ? `step="${field.step}"` : ''} placeholder="${escapeHtml(field.placeholder || '')}" ${req} /></label>`;
+      }).join('');
+      document.getElementById('activity-form').innerHTML = `<h3>Add ${activeKind === 'logbook' ? 'logbook entry' : activeKind === 'loans' ? 'loan record' : 'transaction'}</h3><div class="activity-fields">${controls}</div><button class="btn btn-primary" type="submit">Save ${activeKind === 'logbook' ? 'entry' : activeKind === 'loans' ? 'loan' : 'transaction'}</button>`;
+      const date = document.getElementById('activity-date'); if (date) date.value = new Date().toISOString().slice(0,10);
+    }
+    function addActivity() {
+      const member = currentMember(); if (!member) return;
+      const entry = { id:uid(), date:val('activity-date'), title:val('activity-title'), createdAt:new Date().toISOString() };
+      if (activeKind === 'logbook') { entry.category=val('activity-category'); entry.notes=val('activity-notes'); }
+      if (activeKind === 'loans') { entry.amount=Number(val('activity-amount'))||0; entry.rate=Number(val('activity-rate'))||0; entry.due=val('activity-due'); entry.status=val('activity-status'); entry.notes=val('activity-notes'); }
+      if (activeKind === 'transactions') { entry.type=val('activity-type'); entry.amount=Number(val('activity-amount'))||0; entry.method=val('activity-method'); entry.notes=val('activity-notes'); }
+      member.activities[activeKind].unshift(entry); persist(); renderActivityForm();
+    }
+    function renderActivity() {
+      const member = currentMember(); if (!member) return;
+      const list = [...member.activities[activeKind]];
+      const sort = document.getElementById('activity-sort').value;
+      list.sort((a,b) => sort === 'oldest' ? a.date.localeCompare(b.date) : sort === 'amount' ? (Number(b.amount)||0) - (Number(a.amount)||0) : b.date.localeCompare(a.date));
+      if (!list.length) { document.getElementById('activity-list').innerHTML = `<div class="empty-state compact-empty"><strong>No ${activeKind} saved for this member.</strong><p>Add the first record using the form.</p></div>`; return; }
+      document.getElementById('activity-list').innerHTML = `<div class="activity-cards">${list.map((entry) => {
+        const meta = activeKind === 'logbook' ? entry.category : activeKind === 'loans' ? `${entry.status}${entry.rate ? ` · ${entry.rate}% interest` : ''}${entry.due ? ` · due ${formatDate(entry.due)}` : ''}` : `${entry.type}${entry.method ? ` · ${entry.method}` : ''}`;
+        const value = entry.amount ? `<strong class="activity-amount">${amount(entry.amount)}</strong>` : '';
+        return `<article class="activity-card"><div class="activity-card-top"><div><span class="activity-date">${formatDate(entry.date)}</span><h4>${escapeHtml(entry.title)}</h4></div>${value}</div><div class="activity-meta">${escapeHtml(meta || '')}</div>${entry.notes ? `<p>${escapeHtml(entry.notes)}</p>` : ''}</article>`;
+      }).join('')}</div>`;
+    }
+    function deleteMember(id) { const member = data.members.find((item) => item.id === id); if (!confirm(`Delete ${member ? member.name : 'this member'} and all their saved activity?`)) return; data.members = data.members.filter((item) => item.id !== id); if (selectedId === id) selectedId = null; persist(); renderSelectedMember(); }
+    function renderSummary() {
+      document.getElementById('summary-members').textContent = data.members.length;
+      document.getElementById('summary-active').textContent = data.members.filter((member) => member.status === 'Active').length;
+      document.getElementById('summary-loans').textContent = data.members.reduce((sum, member) => sum + member.activities.loans.length, 0);
+      document.getElementById('summary-transactions').textContent = data.members.reduce((sum, member) => sum + member.activities.transactions.length, 0);
+    }
+    function csvCell(value) { const text = String(value ?? ''); return /[",\r\n]/.test(text) ? `"${text.replace(/"/g,'""')}"` : text; }
+    function exportData() {
+      if (!data.members.length) { alert('Add a member before exporting.'); return; }
+      const rows = [['Record type','Member number','Member name','Date','Description','Category / type','Amount','Status','Details']];
+      data.members.forEach((m) => {
+        rows.push(['Member',m.number,m.name,m.joined,'Profile',m.status,'','',`ID: ${m.idNumber}; Phone: ${m.phone}; Email: ${m.email}; DOB: ${m.dob}; Gender: ${m.gender}; Marital: ${m.marital}; Occupation: ${m.occupation}; Address: ${m.address}; Next of kin: ${m.kin}; Notes: ${m.notes}`]);
+        ['logbook','loans','transactions'].forEach((kind) => m.activities[kind].forEach((a) => rows.push([kind,m.number,m.name,a.date,a.title,a.category||a.type||'',a.amount||'',a.status||'',`Rate: ${a.rate||''}; Due: ${a.due||''}; Method: ${a.method||''}; Notes: ${a.notes||''}`])));
+      });
+      const blob = new Blob(['\ufeff',rows.map((row) => row.map(csvCell).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob); const link=document.createElement('a'); link.href=url; link.download='sacco-member-records.csv'; link.click(); URL.revokeObjectURL(url);
+    }
+  </script>
+  <style>
+    .member-page { max-width:1320px; }
+    .brand { text-decoration:none; }
+    nav a[aria-current="page"] { color:#3448ad; background:#edf0ff; }
+    .member-hero .hero-content { padding:36px 40px; }
+    .eyebrow { margin-bottom:5px; color:#6879c9; font-size:.68rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+    .section-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:20px; }
+    .section-heading h2 { margin:0; }
+    .section-note { color:#858c99; font-size:.77rem; }
+    .form-section { padding:18px 0; border-top:1px solid #edf0f4; }
+    .form-section h3,.activity-form h3,.activity-list-heading h3 { margin:0 0 15px; font-size:.98rem; font-weight:800; }
+    .form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px 18px; }
+    .form-grid .span-2 { grid-column:span 2; }
+    .form-grid input,.form-grid select { min-height:43px; }
+    .form-actions { margin-top:18px; padding-top:17px; border-top:1px solid #edf0f4; }
+    .member-controls { align-items:flex-end; }
+    .member-controls .search-wrapper { flex:2 1 280px; }
+    .member-controls .filter-wrapper { flex:0 1 190px; }
+    .member-table td { font-size:.78rem; }
+    .member-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; }
+    .member-card { min-width:0; padding:18px; background:#fff; border:1px solid #e8eaf0; border-radius:12px; }
+    .member-card.selected-row { box-shadow:0 0 0 2px #4359c7; }
+    .member-card-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+    .member-card h3 { margin:0; color:#303645; font-size:1rem; }
+    .sacco-number { display:block; margin-top:4px; color:#4359c7; font-size:.76rem; font-weight:800; }
+    .member-card-contact { margin:14px 0; color:#687080; font-size:.8rem; }
+    .member-card-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; padding:12px 0; border-top:1px solid #edf0f4; border-bottom:1px solid #edf0f4; }
+    .member-card-stats span { color:#737c8c; font-size:.66rem; }
+    .member-card-stats strong { display:block; color:#3448ad; font-size:1rem; }
+    .member-card-footer { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:13px; }
+    .member-card-footer small { color:#858c99; font-size:.68rem; }
+    .member-card-footer>div { display:flex; align-items:center; gap:8px; }
+    .member-card-footer .btn { padding:8px 12px; font-size:.7rem; }
+    .member-select { display:block; padding:0; color:inherit; text-align:left; background:transparent; border:0; cursor:pointer; }
+    .member-select strong,.member-select span { display:block; }
+    .member-select strong { color:#303645; font-size:.84rem; }
+    .member-select span { margin-top:3px; color:#858c99; font-size:.7rem; }
+    .selected-row { background:#f4f6ff!important; }
+    .status-pill { display:inline-flex; padding:4px 9px; border-radius:999px; color:#53606f; background:#f0f2f5; font-size:.7rem; font-weight:800; }
+    .status-active { color:#23734f; background:#e9f7ef; }
+    .status-dormant { color:#8a6330; background:#fbf3e5; }
+    .status-exited { color:#8a4545; background:#fbecec; }
+    .delete-button { padding:5px 8px; color:#a44c4c; background:#fff; border:1px solid #ead9d9; border-radius:5px; font:inherit; font-size:.7rem; cursor:pointer; }
+    .delete-button:hover { background:#fff4f4; }
+    .member-summary { display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:10px; margin:4px 0 23px; }
+    .member-summary div { min-width:0; padding:12px 14px; background:#f8f9fc; border:1px solid #eaecf1; border-radius:8px; }
+    .member-summary span,.member-summary strong { display:block; overflow-wrap:anywhere; }
+    .member-summary span { margin-bottom:4px; color:#858c99; font-size:.65rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+    .member-summary strong { color:#343a46; font-size:.78rem; }
+    .member-summary p { color:#858c99; font-size:.8rem; }
+    .activity-tabs { display:flex; gap:5px; border-bottom:1px solid #e7e9ef; }
+    .activity-tab { padding:10px 15px; color:#687080; background:transparent; border:0; border-bottom:2px solid transparent; font:inherit; font-size:.8rem; font-weight:800; cursor:pointer; }
+    .activity-tab.active { color:#4359c7; border-bottom-color:#4359c7; }
+    .activity-layout { display:grid; grid-template-columns:minmax(230px,.75fr) minmax(0,1.5fr); gap:24px; padding-top:22px; }
+    .activity-form { align-self:start; padding:17px; background:#f8f9fc; border:1px solid #e8eaf0; border-radius:9px; }
+    .activity-fields { display:grid; grid-template-columns:1fr; gap:12px; margin-bottom:15px; }
+    .activity-fields label { font-size:.7rem; }
+    .activity-fields input,.activity-fields select,.activity-fields textarea { font-size:.82rem; }
+    .activity-fields textarea { min-height:70px; }
+    .activity-form > .btn { width:100%; }
+    .activity-span { grid-column:1/-1; }
+    .activity-list-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .activity-list-heading h3 { margin:0; }
+    .activity-list-heading label { min-width:145px; font-size:.65rem; }
+    .activity-cards { display:grid; gap:9px; margin-top:13px; }
+    .activity-card { padding:14px 15px; border:1px solid #e8eaf0; border-radius:8px; background:#fff; }
+    .activity-card-top { display:flex; justify-content:space-between; gap:12px; }
+    .activity-card h4 { margin:3px 0 0; color:#303645; font-size:.84rem; }
+    .activity-date,.activity-meta { color:#858c99; font-size:.7rem; }
+    .activity-meta { margin-top:8px; color:#56617a; }
+    .activity-card p { margin:8px 0 0; color:#687080; font-size:.78rem; white-space:pre-wrap; }
+    .activity-amount { color:#3448ad; white-space:nowrap; }
+    .compact-empty { margin-top:13px; padding:22px; }
+    .summary-value { overflow-wrap:anywhere; }
+    footer span { margin:0 6px; }
+    @media(max-width:800px) { .activity-layout { grid-template-columns:1fr; } .activity-fields { grid-template-columns:repeat(2,minmax(0,1fr)); } .activity-fields .activity-span { grid-column:span 2; } }
+    @media(max-width:560px) { .member-hero .hero-content { padding:25px 20px; } .form-grid { grid-template-columns:1fr; } .form-grid .span-2 { grid-column:auto; } .section-heading { display:block; } .section-note { display:block; margin-top:5px; } .member-controls .filter-wrapper { flex:1 1 140px; } .activity-fields { grid-template-columns:1fr; } .activity-fields .activity-span { grid-column:auto; } .activity-tabs { overflow-x:auto; } .activity-tab { padding:10px; white-space:nowrap; } }
+  </style>
+  <script src="pwa.js"></script>
+<script src="nav.js"></script>
+<script src="module-sidebar.js"></script></body>
+</html>

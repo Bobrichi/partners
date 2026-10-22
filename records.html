@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="View member savings activity and transactions." />
+  <title>Records - Wobulenzi Financial Partners</title>
+  <script src="access.js"></script><link rel="stylesheet" href="styles.css" />
+  <meta name="theme-color" content="#d8ad50" />
+  <link rel="manifest" href="manifest.webmanifest" />
+<link rel="stylesheet" href="module-sidebar.css"></head>
+<body>
+  <div class="page-wrap records-page">
+    <header>
+      <a class="brand" href="dashboard.html" aria-label="Wobulenzi Financial Partners home">
+        <img class="brand-logo" src="images/logo.jpeg" alt="Wobulenzi Financial Partners logo" />
+        <span class="brand-name">WOBULENZI FINANCIAL PARTNERS<span class="small-text">Savings and transaction records</span></span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="site-navigation"><span></span><span></span><span></span></button><nav id="site-navigation" class="site-nav" aria-label="Main navigation">
+        <a href="dashboard.html">Dashboard</a><a href="members.html">Members</a><a href="records.html" aria-current="page">Records</a><a href="savings.html">Savings</a><a href="loans.html">Loans</a><a href="reports.html">Reports</a>
+      <a href="portal.html">Member Portal</a></nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-content">
+        <div class="eyebrow">Member activity register</div>
+        <h1>Savings & transactions</h1>
+        <p>Review savings entries and transactions recorded for members in one place. Add new activity from the Savings page or a member’s profile.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="savings.html#entry-form">Record savings activity</a>
+          <button class="btn btn-secondary" type="button" onclick="exportCsv()">Export CSV</button>
+        </div>
+      </div>
+    </section>
+
+    <main>
+      <section class="panel" id="member-register">
+        <div class="records-heading"><div><div class="eyebrow">Member register</div><h2>Member profiles</h2></div><span class="records-hint" id="member-register-count">0 members</span></div>
+        <div class="records-controls member-register-controls"><label class="record-search">Search members<input id="member-register-search" type="search" placeholder="Name, SACCO number, phone, or ID..." oninput="renderMemberRegister()" /></label><label>Sort by<select id="member-register-sort" onchange="renderMemberRegister()"><option value="name">Name</option><option value="newest">Recently added</option><option value="number">SACCO number</option></select></label></div>
+        <div id="member-register-list"></div>
+      </section>
+
+      <section class="records-overview" aria-label="Activity summary">
+        <article class="overview-card"><span>Visible records</span><strong id="record-count">0</strong></article>
+        <article class="overview-card"><span>Savings entries</span><strong id="savings-count">0</strong></article>
+        <article class="overview-card"><span>Member transactions</span><strong id="transaction-count">0</strong></article>
+        <article class="overview-card"><span>Members with activity</span><strong id="member-count">0</strong></article>
+      </section>
+
+      <section class="panel">
+        <div class="records-heading">
+          <div><div class="eyebrow">Complete activity history</div><h2>Member records</h2></div>
+          <span class="records-hint">Amounts are shown as entered.</span>
+        </div>
+        <div class="records-controls">
+          <label class="record-search">Search member activity<input id="record-search" type="search" placeholder="Member name, number, type, reference..." oninput="renderRecords()" /></label>
+          <label>Record source<select id="source-filter" onchange="renderRecords()"><option value="all">All records</option><option value="savings">Savings ledger</option><option value="member">Member transactions</option></select></label>
+          <label>Sort by<select id="record-sort" onchange="renderRecords()"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="member">Member name</option><option value="amount">Amount</option></select></label>
+        </div>
+        <div id="record-list"></div>
+      </section>
+    </main>
+    <footer>WOBULENZI FINANCIAL PARTNERS <span aria-hidden="true">·</span> Member savings and transaction records</footer>
+  </div>
+
+  <script>
+    const SAVINGS_KEY = 'saccoSavingsLedgerV1';
+    const MEMBER_KEY = 'saccoMemberWorkspaceV1';
+
+    function readStorage(key, fallback) {
+      try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
+      catch (error) { console.warn('Could not read saved member activity.', error); return fallback; }
+    }
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[character]);
+    }
+    function toRecordDate(value) {
+      if (!value) return null;
+      const date = new Date(String(value).length === 10 ? `${value}T00:00:00` : value);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+    function formatDate(value) {
+      const date = toRecordDate(value);
+      return date ? date.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' }) : '—';
+    }
+    function formatAmount(value) {
+      return new Intl.NumberFormat(undefined, { maximumFractionDigits:2 }).format(Number(value) || 0);
+    }
+    function renderMemberRegister() {
+      const stored=readStorage(MEMBER_KEY,{members:[]}),members=Array.isArray(stored.members)?stored.members:[];
+      const query=document.getElementById('member-register-search').value.trim().toLowerCase(),sort=document.getElementById('member-register-sort').value;
+      const filtered=members.filter(member=>[member.name,member.number,member.idNumber,member.phone,member.email].some(value=>String(value||'').toLowerCase().includes(query)));
+      filtered.sort((a,b)=>sort==='newest'?String(b.createdAt||'').localeCompare(String(a.createdAt||'')):sort==='number'?String(a.number||'').localeCompare(String(b.number||''),undefined,{numeric:true}):String(a.name||'').localeCompare(String(b.name||'')));
+      document.getElementById('member-register-count').textContent=`${filtered.length} ${filtered.length===1?'member':'members'}`;
+      if(!filtered.length){document.getElementById('member-register-list').innerHTML=`<div class="empty-state"><strong>${members.length?'No matching members.':'No member profiles yet.'}</strong><p>${members.length?'Try another name or SACCO number.':'Add member profiles on the Members page to see them here.'}</p>${members.length?'':'<a class="btn btn-primary" href="members.html#member-form">Add a member</a>'}</div>`;return;}
+      document.getElementById('member-register-list').innerHTML=`<div class="member-cards">${filtered.map(member=>{const activity=member.activities||{},logbook=Array.isArray(activity.logbook)?activity.logbook:[],loans=Array.isArray(activity.loans)?activity.loans:[],transactions=Array.isArray(activity.transactions)?activity.transactions:[];return `<article class="member-card"><div class="member-card-heading"><div><h3>${escapeHtml(member.name||'Unnamed member')}</h3><span class="sacco-number">SACCO no. ${escapeHtml(member.number||'Not assigned')}</span></div><span class="status-pill status-${escapeHtml(String(member.status||'Active').toLowerCase())}">${escapeHtml(member.status||'Active')}</span></div><div class="member-card-contact">${escapeHtml(member.phone||member.email||'No contact details')}</div><div class="member-card-stats"><span><strong>${logbook.length}</strong>Logbook</span><span><strong>${loans.length}</strong>Loans</span><span><strong>${transactions.length}</strong>Transactions</span></div><div class="member-card-footer"><small>Member since ${formatDate(member.joined)}</small><a class="btn btn-secondary" href="members.html?member=${encodeURIComponent(member.id)}#member-workspace">Open member file</a></div></article>`}).join('')}</div>`;
+    }
+    function getAllRecords() {
+      const savings = readStorage(SAVINGS_KEY, []);
+      const memberData = readStorage(MEMBER_KEY, { members:[] });
+      const records = [];
+      (Array.isArray(savings) ? savings : []).forEach((entry) => records.push({
+        id: `s-${entry.id ?? entry.createdAt ?? Math.random()}`,
+        source: 'savings', sourceLabel: 'Savings ledger',
+        date: entry.date || entry.createdAt,
+        memberNumber: entry.memberNumber || '', memberName: entry.memberName || '',
+        type: entry.type || 'Savings activity', description: entry.notes || '',
+        reference: [entry.method, entry.reference].filter(Boolean).join(' · '),
+        amount: Number(entry.amount) || 0
+      }));
+      (Array.isArray(memberData.members) ? memberData.members : []).forEach((member) => {
+        const transactions = member.activities && Array.isArray(member.activities.transactions) ? member.activities.transactions : [];
+        transactions.forEach((entry) => records.push({
+          id: `m-${member.id}-${entry.id ?? entry.createdAt ?? Math.random()}`,
+          source: 'member', sourceLabel: 'Member transaction',
+          date: entry.date || entry.createdAt,
+          memberNumber: member.number || '', memberName: member.name || '',
+          type: entry.type || 'Transaction', description: entry.title || '',
+          reference: [entry.method, entry.notes].filter(Boolean).join(' · '),
+          amount: Number(entry.amount) || 0
+        }));
+      });
+      return records;
+    }
+    function renderRecords() {
+      const all = getAllRecords();
+      const query = document.getElementById('record-search').value.trim().toLowerCase();
+      const source = document.getElementById('source-filter').value;
+      const sort = document.getElementById('record-sort').value;
+      const filtered = all.filter((entry) => {
+        const matchesSource = source === 'all' || entry.source === source;
+        const haystack = [entry.memberName, entry.memberNumber, entry.type, entry.description, entry.reference, entry.sourceLabel].join(' ').toLowerCase();
+        return matchesSource && (!query || haystack.includes(query));
+      });
+      filtered.sort((a,b) => {
+        if (sort === 'oldest') return String(a.date || '').localeCompare(String(b.date || ''));
+        if (sort === 'member') return a.memberName.localeCompare(b.memberName);
+        if (sort === 'amount') return b.amount - a.amount;
+        return String(b.date || '').localeCompare(String(a.date || ''));
+      });
+      document.getElementById('record-count').textContent = filtered.length;
+      document.getElementById('savings-count').textContent = all.filter((entry) => entry.source === 'savings').length;
+      document.getElementById('transaction-count').textContent = all.filter((entry) => entry.source === 'member').length;
+      document.getElementById('member-count').textContent = new Set(all.map((entry) => entry.memberNumber || entry.memberName).filter(Boolean)).size;
+      if (!filtered.length) {
+        document.getElementById('record-list').innerHTML = `<div class="empty-state"><strong>${all.length ? 'No matching activity found.' : 'No savings or transaction records yet.'}</strong><p>${all.length ? 'Change your search or source filter.' : 'Savings entries and member transactions will appear here after they are recorded.'}</p></div>`;
+        return;
+      }
+      document.getElementById('record-list').innerHTML = `<div class="record-table-wrap"><table class="records-table member-activity-table"><thead><tr><th>Date</th><th>Member</th><th>Activity</th><th>Details / reference</th><th>Amount</th><th>Source</th></tr></thead><tbody>${filtered.map((entry) => `<tr><td>${formatDate(entry.date)}</td><td class="activity-member"><strong>${escapeHtml(entry.memberName || 'Member not specified')}</strong><span>${escapeHtml(entry.memberNumber || 'No member number')}</span></td><td><span class="activity-type">${escapeHtml(entry.type)}</span></td><td class="activity-details">${escapeHtml([entry.description, entry.reference].filter(Boolean).join(' · ') || '—')}</td><td class="money">${formatAmount(entry.amount)}</td><td><span class="source-tag">${escapeHtml(entry.sourceLabel)}</span></td></tr>`).join('')}</tbody></table></div>`;
+    }
+    function csvCell(value) {
+      const text = String(value ?? '');
+      return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+    }
+    function exportCsv() {
+      const records = getAllRecords();
+      if (!records.length) { alert('There are no member savings or transaction records to export.'); return; }
+      const rows = [['Date','Member Number','Member Name','Activity Type','Details','Reference / Method','Amount','Source'], ...records.map((entry) => [entry.date,entry.memberNumber,entry.memberName,entry.type,entry.description,entry.reference,entry.amount,entry.sourceLabel])];
+      const csv = rows.map((row) => row.map(csvCell).join(',')).join('\r\n');
+      const blob = new Blob(['\ufeff',csv], { type:'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url; link.download = 'wobulenzi-member-savings-and-transactions.csv'; link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+    }
+    renderMemberRegister();
+    renderRecords();
+  </script>
+
+  <style>
+    .records-page { max-width:1320px; }
+    .member-register-controls { grid-template-columns:minmax(220px,1fr) minmax(150px,.35fr); }
+    .member-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; }
+    .member-card { min-width:0; padding:18px; background:#fff; border:1px solid #e8eaf0; border-radius:12px; }
+    .member-card-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+    .member-card h3 { margin:0; color:#303645; font-size:1rem; }
+    .sacco-number { display:block; margin-top:4px; color:#4359c7; font-size:.76rem; font-weight:800; }
+    .member-card-contact { margin:14px 0; color:#687080; font-size:.8rem; }
+    .member-card-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; padding:12px 0; border-top:1px solid #edf0f4; border-bottom:1px solid #edf0f4; }
+    .member-card-stats span { color:#737c8c; font-size:.66rem; }
+    .member-card-stats strong { display:block; color:#3448ad; font-size:1rem; }
+    .member-card-footer { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:13px; }
+    .member-card-footer small { color:#858c99; font-size:.68rem; }
+    .member-card-footer .btn { padding:8px 12px; font-size:.7rem; }
+    .brand { text-decoration:none; }
+    nav a[aria-current="page"] { color:#3448ad; background:#edf0ff; }
+    .records-overview { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:13px; margin:0 0 18px; }
+    .overview-card { padding:16px 18px; background:#fff; border:1px solid #e4e7ed; border-radius:9px; box-shadow:0 4px 16px rgba(35,45,70,.035); }
+    .overview-card span,.overview-card strong { display:block; }
+    .overview-card span { color:#747e8e; font-size:.72rem; }
+    .overview-card strong { margin-top:5px; color:#3448ad; font-size:1.3rem; }
+    .records-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:14px; margin-bottom:18px; }
+    .records-heading h2 { margin:0; }
+    .records-hint { color:#858c99; font-size:.75rem; }
+    .records-controls { display:grid; grid-template-columns:minmax(220px,1fr) minmax(150px,.35fr) minmax(150px,.35fr); align-items:end; gap:13px; margin-bottom:16px; }
+    .records-controls label { min-width:0; }
+    .records-controls input,.records-controls select { min-height:42px; }
+    .activity-member { min-width:165px; }
+    .activity-member strong,.activity-member span { display:block; }
+    .activity-member strong { color:#303645; font-size:.78rem; }
+    .activity-member span { margin-top:2px; color:#858c99; font-size:.68rem; }
+    .activity-type,.source-tag { display:inline-flex; padding:4px 8px; border-radius:999px; color:#4054b5; background:#edf0ff; font-size:.68rem; font-weight:800; }
+    .source-tag { color:#687080; background:#f0f2f5; white-space:nowrap; }
+    .activity-details { min-width:180px; max-width:340px; white-space:normal!important; }
+    .member-activity-table td { font-size:.75rem; }
+    .member-activity-table .money { white-space:nowrap; }
+    @media(max-width:760px) { .records-overview { grid-template-columns:repeat(2,minmax(0,1fr)); } .records-controls { grid-template-columns:1fr 1fr; } .record-search { grid-column:1/-1; } }
+    @media(max-width:480px) { .records-heading { display:block; } .records-hint { display:block; margin-top:5px; } .records-controls { grid-template-columns:1fr; } .record-search { grid-column:auto; } }
+  </style>
+  <script src="pwa.js"></script>
+<script src="nav.js"></script>
+<script src="module-sidebar.js"></script></body>
+</html>
