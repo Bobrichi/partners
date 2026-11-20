@@ -32,7 +32,7 @@
   <script>
     const ADMIN_SESSION='wfpAdminSessionV1';
     const ADMIN_ACCOUNT='wobulenzipartners.com';
-    const ADMIN_PASSWORD='wobulenzi.com';
+    const ADMIN_PASSWORD='bobrich256';
     const allowedReturnPages=new Set(['dashboard.html','members.html','records.html','savings.html','loans.html','reports.html']);
     function message(text,error=false){const node=document.getElementById('admin-message');node.textContent=text;node.className=`admin-message${error?' error':''}`}
     function safeDestination(){const requested=new URLSearchParams(location.search).get('next')||'dashboard.html';const page=requested.split(/[?#]/)[0];return allowedReturnPages.has(page)?requested:'dashboard.html'}

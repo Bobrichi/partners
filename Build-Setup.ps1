@@ -55,7 +55,7 @@ internal static class WfpSetup {
                     Directory.CreateDirectory(Path.GetDirectoryName(destination));
                     entry.ExtractToFile(destination, true);
                 }
-            }
+            
             string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
             Type shellType = Type.GetTypeFromProgID("WScript.Shell");
             object shell = Activator.CreateInstance(shellType);
@@ -78,11 +78,14 @@ internal static class WfpSetup {
 }
 '@ | Set-Content -LiteralPath $sourcePath -Encoding UTF8
 
-    $arguments = @('/nologo', '/target:winexe', '/optimize+', '/reference:System.Windows.Forms.dll', '/reference:System.IO.Compression.dll', '/reference:System.IO.Compression.FileSystem.dll', "/resource:$zipPath,WfpSite.zip", "/out:$outputPath", $sourcePath)
+    $arguments = @('/nologo', '/target:winexe', '/optimize+', 
+    '/reference:System.Windows.Forms.dll', '/reference:System.IO.Compression.dll', 
+    '/reference:System.IO.Compression.FileSystem.dll', "/resource:$zipPath,WfpSite.zip", "/out:$outputPath", $sourcePath)
     $argumentLine = ($arguments | ForEach-Object { '"' + $_.Replace('"', '\"') + '"' }) -join ' '
     $process = Start-Process -FilePath $compiler -ArgumentList $argumentLine -Wait -PassThru -NoNewWindow
     if ($process.ExitCode -ne 0) { throw "C# compilation failed with exit code $($process.ExitCode)." }
     Write-Host "Created $outputPath"
-} finally {
+}
+ finally {
     Remove-Item -LiteralPath $tempRoot -Recurse -Force -ErrorAction SilentlyContinue
 }
